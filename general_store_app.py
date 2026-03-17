@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """General Store Web Application using Flask."""
 
-from flask import Flask, render_template, request, jsonify, session
-from datetime import datetime
-import json
 import os
+import sys
+import json
+from datetime import datetime
+
+# Suppress deprecation warnings for Python 3.14 compatibility
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+from flask import Flask, render_template, request, jsonify, session
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here_change_in_production'
+app.config['JSON_SORT_KEYS'] = False
 
 # Sample product database
 PRODUCTS = [
@@ -155,4 +162,11 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print("🚀 Starting General Store Web Application...")
+    print("📍 Open your browser: http://localhost:5000")
+    print("⚠️  Press Ctrl+C to stop the server")
+    try:
+        app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\n👋 Server stopped!")
+        sys.exit(0)
