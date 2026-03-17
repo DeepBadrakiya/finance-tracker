@@ -1,0 +1,12 @@
+{
+  "transactions": [
+    {
+      "type": "income",
+      "amount": 2000.0,
+      "category": "salary",
+      "description": "blank",
+      "date": "2026-03-17 12:34:44"
+    }
+  ],
+  "budget": {}
+}

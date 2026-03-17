@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Home - General Store{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white text-center py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Welcome to General Store</h1>
+        <p class="lead mb-4">Discover quality products at unbeatable prices</p>
+        <a href="/products" class="btn btn-light btn-lg me-2">
+            <i class="fas fa-shopping-bags"></i> Shop Now
+        </a>
+        <a href="/about" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-info-circle"></i> Learn More
+        </a>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="stat-box p-4">
+                    <i class="fas fa-box fa-3x text-primary mb-3"></i>
+                    <h3>{{ products_count }}+</h3>
+                    <p>Products Available</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box p-4">
+                    <i class="fas fa-truck fa-3x text-success mb-3"></i>
+                    <h3>Fast</h3>
+                    <p>Free Shipping</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box p-4">
+                    <i class="fas fa-headset fa-3x text-info mb-3"></i>
+                    <h3>24/7</h3>
+                    <p>Customer Support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Categories -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Shop by Category</h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <a href="/products?category=Electronics" class="category-card text-decoration-none">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-laptop fa-4x text-primary mb-3"></i>
+                            <h5 class="card-title">Electronics</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 mb-4">
+                <a href="/products?category=Appliances" class="category-card text-decoration-none">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-blender fa-4x text-success mb-3"></i>
+                            <h5 class="card-title">Appliances</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 mb-4">
+                <a href="/products?category=Office" class="category-card text-decoration-none">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-chair fa-4x text-warning mb-3"></i>
+                            <h5 class="card-title">Office</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 mb-4">
+                <a href="/products?category=Furniture" class="category-card text-decoration-none">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-couch fa-4x text-danger mb-3"></i>
+                            <h5 class="card-title">Furniture</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-primary text-white py-5 text-center">
+    <div class="container">
+        <h2 class="mb-4">Join Our Community</h2>
+        <p class="lead mb-4">Get exclusive deals and updates delivered to your inbox</p>
+        <form class="d-flex justify-content-center gap-2">
+            <input type="email" class="form-control w-auto" placeholder="Enter your email" required>
+            <button type="submit" class="btn btn-light">Subscribe</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
