@@ -124,11 +124,11 @@ HTML_CART = """<!DOCTYPE html>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-body { background: #f5f5f5; }
-.navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
-.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
-.btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
-.total-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
+body {{ background: #f5f5f5; }}
+.navbar {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }}
+.btn-primary {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }}
+.btn-primary:hover {{ background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }}
+.total-box {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }}
 </style>
 </head>
 <body>
@@ -190,22 +190,23 @@ def products():
 def cart():
     cart_items = flask.session.get('cart', [])
     
+    # Build cart items HTML
     if not cart_items:
-        cart_html = EMPTY_CART
+        cart_content = EMPTY_CART
     else:
         total = sum(item['price'] * item['quantity'] for item in cart_items)
-        rows = "".join([f"""
-        <tr>
+        tax = total * 0.1
+        grand_total = total * 1.1
+        rows = "".join([f"""        <tr>
             <td>{item['name']}</td>
             <td>${item['price']:.2f}</td>
             <td>{item['quantity']}</td>
             <td>${item['price'] * item['quantity']:.2f}</td>
             <td><button class="btn btn-danger btn-sm" onclick="removeFromCart({item['id']})"><i class="fas fa-trash"></i></button></td>
         </tr>
-        """ for item in cart_items])
+""" for item in cart_items])
         
-        cart_html = f"""
-        <div class="row">
+        cart_content = f"""        <div class="row">
             <div class="col-lg-8">
                 <table class="table table-hover">
                     <thead class="table-light">
@@ -218,8 +219,7 @@ def cart():
                         </tr>
                     </thead>
                     <tbody>
-                        {rows}
-                    </tbody>
+{rows}                    </tbody>
                 </table>
             </div>
             <div class="col-lg-4">
@@ -228,16 +228,68 @@ def cart():
                     <hr style="border-color: rgba(255,255,255,0.3);">
                     <p>Subtotal: <strong>${total:.2f}</strong></p>
                     <p>Shipping: <strong>FREE</strong></p>
-                    <p>Tax: <strong>${total * 0.1:.2f}</strong></p>
+                    <p>Tax: <strong>${tax:.2f}</strong></p>
                     <hr style="border-color: rgba(255,255,255,0.3);">
-                    <h4>Total: <strong>${total * 1.1:.2f}</strong></h4>
+                    <h4>Total: <strong>${grand_total:.2f}</strong></h4>
                     <button class="btn btn-light w-100 mt-3" onclick="checkout()"><i class="fas fa-credit-card"></i> Checkout</button>
                 </div>
             </div>
         </div>
-        """
+"""
     
-    html = HTML_CART.format(cart_html=cart_html)
+    html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopping Cart - General Store</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+body { background: #f5f5f5; }
+.navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
+.btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+.total-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<nav class="navbar navbar-dark">
+<div class="container-fluid">
+<span class="navbar-brand fs-4 fw-bold">🛍️ General Store</span>
+<div>
+<a href="/products" class="btn btn-light btn-sm">← Continue Shopping</a>
+</div>
+</div>
+</nav>
+<div class="container py-5">
+<h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h2>
+""" + cart_content + """
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function removeFromCart(itemId) {
+    if (confirm('Remove this item?')) {
+        fetch('/api/remove-from-cart', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: itemId})
+        })
+        .then(r => r.json())
+        .then(data => {
+            location.reload();
+        });
+    }
+}
+function checkout() {
+    alert('✅ Order placed! Thank you for shopping!');
+    fetch('/api/checkout', {method: 'POST'})
+    .then(r => location.href = '/');
+}
+</script>
+</body>
+</html>"""
+    
     return html, 200, {"Content-Type": "text/html; charset=utf-8"}
 
 @app.route("/api/add-to-cart", methods=["POST"])
