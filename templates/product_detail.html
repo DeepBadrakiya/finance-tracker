@@ -57,7 +57,7 @@
                 <input type="number" id="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}" style="width: 100px;">
             </div>
             
-            <button class="btn btn-primary btn-lg w-100 mb-2" onclick="addProductToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+            <button class="btn btn-primary btn-lg w-100 mb-2 add-product-to-cart-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}">
                 <i class="fas fa-cart-plus"></i> Add to Cart
             </button>
             <a href="/products" class="btn btn-outline-secondary btn-lg w-100">
@@ -73,25 +73,4 @@
         </div>
     </div>
 </div>
-
-<script>
-function addProductToCart(productId, productName, price) {
-    const quantity = parseInt(document.getElementById('quantity').value);
-    
-    fetch('/api/add-to-cart', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({product_id: productId, quantity: quantity})
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            alert('✓ ' + quantity + 'x ' + productName + ' added to cart!');
-            updateCartCount(data.cart_count);
-        } else {
-            alert('❌ ' + data.message);
-        }
-    });
-}
-</script>
 {% endblock %}

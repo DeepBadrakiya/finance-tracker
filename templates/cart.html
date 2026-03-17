@@ -29,7 +29,7 @@
                                 <td>{{ item.quantity }}</td>
                                 <td>${{ "%.2f"|format(item.price * item.quantity) }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-danger" onclick="removeItem({{ item.id }})">
+                                    <button class="btn btn-sm btn-danger remove-item-btn" data-product-id="{{ item.id }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -121,43 +121,4 @@
     </div>
     {% endif %}
 </div>
-
-<script>
-document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const orderData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        address: document.getElementById('address').value
-    };
-    
-    fetch('/api/checkout', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(orderData)
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            alert('✓ Order placed! Order ID: ' + data.order_id);
-            window.location.href = '/orders';
-        } else {
-            alert('❌ ' + data.message);
-        }
-    });
-});
-
-function removeItem(productId) {
-    fetch('/api/remove-from-cart/' + productId, {method: 'POST'})
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            document.querySelector('[data-product-id="' + productId + '"]').remove();
-            updateCartCount(data.cart_count);
-            if(data.cart_count === 0) location.reload();
-        }
-    });
-}
-</script>
 {% endblock %}

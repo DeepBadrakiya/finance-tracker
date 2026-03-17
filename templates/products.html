@@ -40,7 +40,7 @@
                         <a href="/product/{{ product.id }}" class="btn btn-sm btn-outline-primary w-100 mb-2">
                             <i class="fas fa-eye"></i> View Details
                         </a>
-                        <button class="btn btn-sm btn-primary w-100" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                        <button class="btn btn-sm btn-primary w-100 add-to-cart-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" data-product-price="{{ product.price }}">
                             <i class="fas fa-cart-plus"></i> Add to Cart
                         </button>
                     </div>
@@ -57,32 +57,4 @@
         {% endfor %}
     </div>
 </div>
-
-<script>
-function addToCart(productId, productName, price) {
-    fetch('/api/add-to-cart', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({product_id: productId, quantity: 1})
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            showNotification('✓ ' + productName + ' added to cart!', 'success');
-            updateCartCount(data.cart_count);
-        } else {
-            showNotification('❌ ' + data.message, 'error');
-        }
-    });
-}
-
-function showNotification(msg, type) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 end-0 m-3`;
-    alertDiv.textContent = msg;
-    alertDiv.style.zIndex = 9999;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => alertDiv.remove(), 3000);
-}
-</script>
 {% endblock %}

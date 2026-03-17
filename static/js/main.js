@@ -33,8 +33,67 @@ function showNotification(message, type = 'success') {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Get current cart count from session (if available)
-    // This would need a separate endpoint to fetch cart count
+    // Add to cart button listeners
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const productName = this.dataset.productName;
+            const price = this.dataset.productPrice;
+            addToCart(productId, productName, price);
+        });
+    });
+
+    // Add product to cart button listeners
+    document.querySelectorAll('.add-product-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const productName = this.dataset.productName;
+            const price = this.dataset.productPrice;
+            addProductToCart(productId, productName, price);
+        });
+    });
+
+    // Remove item button listeners
+    document.querySelectorAll('.remove-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            removeFromCart(productId);
+        });
+    });
+
+    // Checkout form handler
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const orderData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value
+            };
+            
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(orderData)
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('✓ Order placed! Order ID: ' + data.order_id, 'success');
+                    setTimeout(() => window.location.href = '/orders', 1000);
+                } else {
+                    showNotification('❌ ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error placing order', 'error');
+            });
+        });
+    }
+
     console.log('General Store loaded successfully');
 });
 
@@ -95,6 +154,33 @@ function addToCart(productId, productName, price) {
     });
 }
 
+// Add product to cart with quantity
+function addProductToCart(productId, productName, price) {
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
+    
+    fetch('/api/add-to-cart', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('✓ ' + quantity + 'x ' + productName + ' added to cart!', 'success');
+            updateCartCount(data.cart_count);
+        } else {
+            showNotification('❌ ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error adding to cart', 'error');
+    });
+}
+
 // Remove from cart
 function removeFromCart(productId) {
     if (confirm('Are you sure you want to remove this item?')) {
@@ -107,8 +193,14 @@ function removeFromCart(productId) {
             if (data.success) {
                 showNotification('Item removed from cart', 'success');
                 updateCartCount(data.cart_count);
-                // Refresh the page or update cart display
-                location.reload();
+                // Remove from DOM
+                const row = document.querySelector('[data-product-id="' + productId + '"]');
+                if (row) row.remove();
+                
+                // Reload if cart is now empty
+                if (data.cart_count === 0) {
+                    setTimeout(() => location.reload(), 500);
+                }
             } else {
                 showNotification('Error removing item', 'error');
             }
