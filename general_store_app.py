@@ -12,9 +12,15 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 from flask import Flask, render_template, request, jsonify, session
 
-app = Flask(__name__)
+# Get the current directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR, static_url_path='/static')
 app.secret_key = 'your_secret_key_here_change_in_production'
 app.config['JSON_SORT_KEYS'] = False
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching
 
 # Sample product database
 PRODUCTS = [
@@ -161,10 +167,28 @@ def page_not_found(e):
     """Handle 404 errors."""
     return render_template('404.html'), 404
 
+@app.errorhandler(403)
+def forbidden(e):
+    """Handle 403 errors."""
+    return render_template('404.html'), 403
+
+@app.errorhandler(Exception)
+def handle_error(error):
+    """Handle general errors."""
+    print(f"Error: {error}")
+    print(f"Error type: {type(error)}")
+    import traceback
+    traceback.print_exc()
+    return f"<h1>Error</h1><p>{str(error)}</p>", 500
+
 if __name__ == '__main__':
     print("🚀 Starting General Store Web Application...")
+    print(f"📁 Base directory: {BASE_DIR}")
+    print(f"📁 Templates: {TEMPLATE_DIR}")
+    print(f"📁 Static: {STATIC_DIR}")
     print("📍 Open your browser: http://localhost:5000")
     print("⚠️  Press Ctrl+C to stop the server")
+    print()
     try:
         app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
     except KeyboardInterrupt:
